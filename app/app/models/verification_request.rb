@@ -1,11 +1,11 @@
 class VerificationRequest < ApplicationRecord
   enum :status, {
-    pending: 0,
-    in_progress: 1,
-    fulfilled: 2,
-    rejected: 3,
-    cancelled: 4
-  }, default: :pending, validate: true
+    created: 0,
+    sent: 1,
+    in_progress: 2,
+    completed: 3,
+    expired: 4
+  }, default: :created, validate: true
 
   belongs_to :cbv_applicant
   belongs_to :verification_objective
