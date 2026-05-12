@@ -126,6 +126,14 @@ Rails.application.routes.draw do
   namespace :api do
     scope :v1 do
       post "/invitations", to: "invitations#create"
+      resources :verification_requests, only: [:create], controller: "v1/verification_requests" do
+        member do
+          post :issue_entry_token
+        end
+        collection do
+          post :exchange_entry_token
+        end
+      end
     end
 
     scope :pinwheel do
