@@ -13,6 +13,7 @@ class FlowDefinition < ApplicationRecord
   validates :verification_objective_id, uniqueness: { scope: :version }
 
   before_validation :set_published_at
+  after_create :record_draft_creation, if: :draft?
   before_update :prevent_mutation_when_active
   before_destroy :prevent_destroy_when_active
 
@@ -34,5 +35,14 @@ class FlowDefinition < ApplicationRecord
 
     errors.add(:base, "Active flow definitions cannot be deleted")
     throw(:abort)
+  end
+
+  def record_draft_creation
+    FlowDefinitionAuditEvent.create!(
+      flow_definition: self,
+      verification_objective:,
+      event_type: "draft_created",
+      payload: { version: version }
+    )
   end
 end
