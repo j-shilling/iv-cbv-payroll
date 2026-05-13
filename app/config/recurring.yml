@@ -8,3 +8,7 @@ production:
   draft_cleanup:
     class: DraftCleanupJob
     schedule: every hour
+
+  verification_data_retention:
+    class: VerificationDataRetentionJob
+    schedule: every day at 2:15am
