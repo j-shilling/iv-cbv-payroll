@@ -1,7 +1,22 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
-#   Character.create(name: "Luke", movie: movies.first)
+# frozen_string_literal: true
+
+if StudentEnrollmentVerificationDefinition.enabled?
+  objective = VerificationObjective.find_or_create_by!(
+    objective_key: StudentEnrollmentVerificationDefinition::OBJECTIVE_KEY,
+    version: 1
+  ) do |record|
+    record.name = "Student enrollment verification"
+    record.description = "Collect attestation, school details, and evidence"
+    record.metadata = { "pilot" => "internal_users" }
+  end
+
+  flow_definition = FlowDefinition.find_or_create_by!(
+    verification_objective: objective,
+    version: 1,
+    status: :draft
+  ) do |record|
+    record.definition_payload = StudentEnrollmentVerificationDefinition.payload
+  end
+
+  FlowDefinitionPublisher.new(flow_definition).publish
+end

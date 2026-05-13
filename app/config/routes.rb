@@ -149,6 +149,13 @@ Rails.application.routes.draw do
     end
   end
 
+
+  if Rails.application.config.is_internal_environment
+    namespace :internal do
+      resources :verification_requests, only: [:show]
+    end
+  end
+
   mount MissionControl::Jobs::Engine, at: "/jobs"
 
   match "/404", to: "pages#error_404", via: :all
