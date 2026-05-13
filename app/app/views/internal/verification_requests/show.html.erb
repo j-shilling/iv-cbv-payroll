@@ -1,0 +1,32 @@
+<h1>
+  Worker review summary
+</h1>
+
+<p>
+  Objective: <%= @verification_request.verification_objective.name %>
+</p>
+<p>
+  Case ID: <%= @verification_request.case_identifier %>
+</p>
+
+<h2>
+  Collected responses
+</h2>
+
+<% @verification_request.verification_steps.order(:id).each do |step| %>
+  <h3>
+    <%= step.step_key.humanize %>
+  </h3>
+  <pre><%= JSON.pretty_generate(step.payload) %></pre>
+<% end %>
+
+<h2>
+  Evidence
+</h2>
+
+<% @verification_request.verification_evidence.order(:id).each do |evidence| %>
+  <h3>
+    <%= evidence.evidence_type.humanize %>
+  </h3>
+  <pre><%= JSON.pretty_generate(evidence.payload) %></pre>
+<% end %>
