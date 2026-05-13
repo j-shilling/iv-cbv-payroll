@@ -7,5 +7,15 @@ FactoryBot.define do
     requested_at { Time.current }
     definition_snapshot { flow_definition.definition_payload }
     status { :created }
+
+
+    trait :completed do
+      status { :completed }
+      completed_at { requested_at + 2.hours }
+    end
+
+    trait :expired do
+      status { :expired }
+    end
   end
 end
