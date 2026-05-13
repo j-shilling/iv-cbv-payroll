@@ -46,15 +46,26 @@ class FlowDefinitionValidator
 
         require_string(field, "name", "#{fields_path}[#{field_idx}]")
         required = field["required"]
-        if required != true && required != false
-          add_error("#{fields_path}[#{field_idx}].required", "must be a boolean")
-        end
+        add_error("#{fields_path}[#{field_idx}].required", "must be a boolean") if required != true && required != false
       end
     end
   end
 
   def validate_branching(value, path)
     expect_array(value, path)
+    return unless value.is_a?(Array)
+
+    value.each_with_index do |rule, idx|
+      expect_hash(rule, "#{path}[#{idx}]")
+      next unless rule.is_a?(Hash)
+
+      require_string(rule, "key", "#{path}[#{idx}]")
+      require_string(rule, "branch", "#{path}[#{idx}]")
+      priority = rule["priority"]
+      add_error("#{path}[#{idx}].priority", "must be an integer") unless priority.is_a?(Integer)
+
+      expect_array(rule["conditions"], "#{path}[#{idx}].conditions")
+    end
   end
 
   def validate_evidence(value, path)
@@ -62,6 +73,19 @@ class FlowDefinitionValidator
     return unless value.is_a?(Hash)
 
     expect_array(value["required"], "#{path}.required")
+    conditional = value["conditional"]
+    return if conditional.nil?
+
+    expect_array(conditional, "#{path}.conditional")
+    return unless conditional.is_a?(Array)
+
+    conditional.each_with_index do |rule, idx|
+      expect_hash(rule, "#{path}.conditional[#{idx}]")
+      next unless rule.is_a?(Hash)
+
+      require_string(rule, "if_missing", "#{path}.conditional[#{idx}]")
+      expect_array(rule["then_require"], "#{path}.conditional[#{idx}].then_require")
+    end
   end
 
   def validate_completion(value, path)
@@ -76,9 +100,7 @@ class FlowDefinitionValidator
     return unless value.is_a?(Hash)
 
     encryption = value["encryption_required"]
-    if encryption != true && encryption != false
-      add_error("#{path}.encryption_required", "must be a boolean")
-    end
+    add_error("#{path}.encryption_required", "must be a boolean") if encryption != true && encryption != false
   end
 
   def expect_hash(value, path)
