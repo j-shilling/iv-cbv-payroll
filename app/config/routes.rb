@@ -152,7 +152,11 @@ Rails.application.routes.draw do
 
   if Rails.application.config.is_internal_environment
     namespace :internal do
-      resources :verification_requests, only: [:show]
+      resources :verification_requests, only: [:show] do
+        member do
+          get :branch_debug
+        end
+      end
     end
   end
 
